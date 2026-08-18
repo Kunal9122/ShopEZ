@@ -1,3 +1,6 @@
+import dns from "node:dns";
+
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -26,6 +29,10 @@ app.use("/api/orders", orderRoutes);
 // Root Route
 app.get("/", (req, res) => {
   res.send("ShopEZ API Server is running...");
+});
+
+app.get("/", (req, res) => {
+  res.send("ShopEZ backend is running");
 });
 
 // Start Server
