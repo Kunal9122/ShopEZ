@@ -63,11 +63,30 @@ const FALLBACK_PRODUCTS = [
 
 export async function connectDB() {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`[ShopEZ MongoDB] Connected: ${conn.connection.host}`);
+    const uri = process.env.MONGO_URI;
+
+    if (!uri) {
+      console.error("❌ MONGO_URI is not defined in Render Environment Variables.");
+      process.exit(1);
+    }
+
+    // Show only the host portion, never the username/password
+    const hostPart = uri.includes("@")
+      ? uri.split("@").pop()
+      : "Invalid MongoDB URI";
+
+    console.log("[MongoDB] Host part received by Render:", hostPart);
+
+    const conn = await mongoose.connect(uri);
+
+    console.log(
+      `[ShopEZ MongoDB] Connected: ${conn.connection.host}`
+    );
+
     await seedDatabase();
+
   } catch (error) {
-    console.error("MongoDB connection error:", error.message);
+    console.error("❌ MongoDB connection error:", error.message);
     process.exit(1);
   }
 }
