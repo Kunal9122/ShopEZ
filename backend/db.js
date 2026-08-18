@@ -63,34 +63,11 @@ const FALLBACK_PRODUCTS = [
 
 export async function connectDB() {
   try {
-    const mongoHost = process.env.MONGO_HOST;
-    const mongoUser = process.env.MONGO_USER;
-    const mongoPassword = process.env.MONGO_PASSWORD;
-    const mongoDatabase = process.env.MONGO_DATABASE || "ShopEZ";
-
-    if (!mongoHost || !mongoUser || !mongoPassword) {
-      console.error("❌ MongoDB environment variables are missing.");
-      console.error("Required: MONGO_HOST, MONGO_USER, MONGO_PASSWORD");
-      process.exit(1);
-    }
-
-    const mongoUri = `mongodb+srv://${mongoHost}/${mongoDatabase}`;
-
-    console.log(`[MongoDB] Connecting to: ${mongoHost}`);
-
-    const conn = await mongoose.connect(mongoUri, {
-      user: mongoUser,
-      pass: mongoPassword
-    });
-
-    console.log(
-      `[ShopEZ MongoDB] Connected: ${conn.connection.host}`
-    );
-
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`[ShopEZ MongoDB] Connected: ${conn.connection.host}`);
     await seedDatabase();
-
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error.message);
+    console.error("MongoDB connection error:", error.message);
     process.exit(1);
   }
 }
