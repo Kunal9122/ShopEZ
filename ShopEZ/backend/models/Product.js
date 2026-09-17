@@ -30,6 +30,5 @@ const productSchema = new mongoose.Schema({
   },
 });
 
-// Pass "ShopEZ" as the 3rd argument to bind directly to your existing collection
-const Product = mongoose.model("Product", productSchema, "ShopEZ");
+const Product = mongoose.model("Product", productSchema);
 export default Product;

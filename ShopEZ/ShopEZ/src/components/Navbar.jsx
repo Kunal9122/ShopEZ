@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
 import { AuthContext } from "../context/AuthContext";
@@ -7,8 +7,6 @@ import "./Navbar.css";
 function Navbar() {
   const { cartItems } = useContext(CartContext);
   const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const cartCount = cartItems.reduce(
     (total, item) => total + item.quantity,
@@ -16,21 +14,11 @@ function Navbar() {
   );
 
   const handleSearch = (e) => {
-    const value = e.target.value;
-
-    // If not currently on the products page, automatically switch to it
-    if (location.pathname !== "/products") {
-      navigate("/products");
-    }
-
-    // Small delay ensures Products page mounts before event fires
-    setTimeout(() => {
-      window.dispatchEvent(
-        new CustomEvent("search", {
-          detail: value,
-        })
-      );
-    }, 50);
+    window.dispatchEvent(
+      new CustomEvent("search", {
+        detail: e.target.value,
+      })
+    );
   };
 
   return (

@@ -13,7 +13,8 @@ function Products() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    API.get("/products")
+    API
+      .get("/products")
       .then((response) => {
         setProducts(response.data);
         setLoading(false);
@@ -24,10 +25,11 @@ function Products() {
       });
   }, []);
 
-  // Listen to search events coming from Navbar
+  // Search from Navbar
   useEffect(() => {
+
     const handleSearch = (e) => {
-      setSearchTerm((e.detail || "").toLowerCase());
+      setSearchTerm(e.detail.toLowerCase());
     };
 
     window.addEventListener("search", handleSearch);
@@ -36,42 +38,35 @@ function Products() {
       window.removeEventListener("search", handleSearch);
     };
   }, []);
-
-  // Handle typing directly in the lower search bar
-  const handleLocalSearchChange = (value) => {
-    const lowerVal = value.toLowerCase();
-    setSearchTerm(lowerVal);
-    // Dispatch event back so Navbar input updates too
-    window.dispatchEvent(new CustomEvent("search", { detail: value }));
-  };
-
   useEffect(() => {
-    const selectedCategory = searchParams.get("category");
+  const selectedCategory = searchParams.get("category");
 
-    if (!selectedCategory) {
-      setCategory("all");
-      return;
-    }
+  if (!selectedCategory) {
+    setCategory("all");
+    return;
+  }
 
-    if (selectedCategory === "fashion") {
-      setCategory("men's clothing");
-    } else if (selectedCategory === "electronics" || selectedCategory === "mobiles") {
-      setCategory("electronics");
-    } else if (selectedCategory === "groceries") {
-      setCategory("all");
-    }
-  }, [searchParams]);
+  if (selectedCategory === "fashion") {
+    setCategory("men's clothing");
+  } else if (selectedCategory === "electronics") {
+    setCategory("electronics");
+  } else if (selectedCategory === "mobiles") {
+    setCategory("electronics");
+  } else if (selectedCategory === "groceries") {
+    setCategory("all");
+  }
+}, [searchParams]);
 
   // Categories
   const categories = [
     "all",
-    ...new Set(products.map((p) => p.category).filter(Boolean)),
+    ...new Set(products.map((p) => p.category)),
   ];
 
   // Filter
   let filteredProducts = products.filter((product) => {
     const matchesSearch = product.title
-      ?.toLowerCase()
+      .toLowerCase()
       .includes(searchTerm);
 
     const matchesCategory =
@@ -91,13 +86,18 @@ function Products() {
 
   if (sortBy === "rating") {
     filteredProducts.sort(
-      (a, b) => (b.rating?.rate || 0) - (a.rating?.rate || 0)
+      (a, b) => b.rating.rate - a.rating.rate
     );
   }
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: "80px" }}>
+      <div
+        style={{
+          textAlign: "center",
+          padding: "80px",
+        }}
+      >
         <h2>Loading Products...</h2>
       </div>
     );
@@ -111,7 +111,12 @@ function Products() {
         padding: "30px",
       }}
     >
-      <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "30px",
+        }}
+      >
         🛍 Our Products
       </h1>
 
@@ -126,7 +131,7 @@ function Products() {
           border: "1px solid #f0f2f5",
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
+          gap: "20px"
         }}
       >
         {/* Row 1: Search & Sort */}
@@ -136,10 +141,10 @@ function Products() {
             justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: "15px",
+            gap: "15px"
           }}
         >
-          {/* Lower Search Input */}
+          {/* Local Search Input */}
           <div
             style={{
               display: "flex",
@@ -148,7 +153,7 @@ function Products() {
               borderRadius: "10px",
               padding: "10px 16px",
               width: "100%",
-              maxWidth: "400px",
+              maxWidth: "400px"
             }}
           >
             <span style={{ marginRight: "10px", color: "#9ca3af" }}>🔍</span>
@@ -156,26 +161,26 @@ function Products() {
               type="text"
               placeholder="Search products, brands and more..."
               value={searchTerm}
-              onChange={(e) => handleLocalSearchChange(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
               style={{
                 border: "none",
                 background: "transparent",
                 outline: "none",
                 width: "100%",
                 fontSize: "15px",
-                color: "#1f2937",
+                color: "#1f2937"
               }}
             />
             {searchTerm && (
               <button
-                onClick={() => handleLocalSearchChange("")}
+                onClick={() => setSearchTerm("")}
                 style={{
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
                   color: "#9ca3af",
                   fontSize: "16px",
-                  padding: "0",
+                  padding: "0"
                 }}
               >
                 ✕
@@ -185,11 +190,7 @@ function Products() {
 
           {/* Sort Dropdown */}
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span
-              style={{ fontSize: "14px", fontWeight: "600", color: "#6b7280" }}
-            >
-              Sort by:
-            </span>
+            <span style={{ fontSize: "14px", fontWeight: "600", color: "#6b7280" }}>Sort by:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -202,7 +203,7 @@ function Products() {
                 fontWeight: "600",
                 color: "#374151",
                 cursor: "pointer",
-                outline: "none",
+                outline: "none"
               }}
             >
               <option value="">Featured</option>
@@ -221,7 +222,7 @@ function Products() {
               gap: "10px",
               overflowX: "auto",
               paddingBottom: "5px",
-              scrollbarWidth: "none",
+              scrollbarWidth: "none" // Hide scrollbar for clean style
             }}
           >
             {categories.map((cat) => (
@@ -232,10 +233,7 @@ function Products() {
                   padding: "8px 18px",
                   borderRadius: "20px",
                   border: category === cat ? "none" : "1px solid #e5e7eb",
-                  background:
-                    category === cat
-                      ? "linear-gradient(135deg, #4f46e5, #7c3aed)"
-                      : "white",
+                  background: category === cat ? "linear-gradient(135deg, #4f46e5, #7c3aed)" : "white",
                   color: category === cat ? "white" : "#4b5563",
                   fontWeight: "bold",
                   cursor: "pointer",
@@ -243,10 +241,7 @@ function Products() {
                   textTransform: "capitalize",
                   fontSize: "14px",
                   whiteSpace: "nowrap",
-                  boxShadow:
-                    category === cat
-                      ? "0 4px 10px rgba(79, 70, 229, 0.25)"
-                      : "none",
+                  boxShadow: category === cat ? "0 4px 10px rgba(79, 70, 229, 0.25)" : "none"
                 }}
                 onMouseOver={(e) => {
                   if (category !== cat) {
@@ -268,23 +263,35 @@ function Products() {
         </div>
       </div>
 
-      <p style={{ marginBottom: "20px", color: "#666" }}>
+      <p
+        style={{
+          marginBottom: "20px",
+          color: "#666",
+        }}
+      >
         Showing {filteredProducts.length} products
       </p>
 
       {filteredProducts.length === 0 ? (
-        <h2 style={{ textAlign: "center" }}>No products found 😢</h2>
+        <h2
+          style={{
+            textAlign: "center",
+          }}
+        >
+          No products found 😢
+        </h2>
       ) : (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(280px,1fr))",
             gap: "25px",
           }}
         >
           {filteredProducts.map((product) => (
             <ProductCard
-              key={product._id || product.id}
+              key={product.id}
               product={product}
             />
           ))}
