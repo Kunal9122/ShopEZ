@@ -63,7 +63,16 @@ const FALLBACK_PRODUCTS = [
 
 export async function connectDB() {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+    if (!mongoUri) {
+      console.error("DEBUG - Available environment keys:", Object.keys(process.env));
+      throw new Error(
+        "MongoDB URI is missing. Ensure MONGO_URI or MONGODB_URI is set in your Render Environment tab."
+      );
+    }
+
+    const conn = await mongoose.connect(mongoUri);
     console.log(`[ShopEZ MongoDB] Connected: ${conn.connection.host}`);
     await seedDatabase();
   } catch (error) {
